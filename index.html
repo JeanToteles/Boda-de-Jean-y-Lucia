@@ -34,14 +34,13 @@
             min-height: 100vh;
         }
 
-        /* Pantalla de Apertura / Bienvenida con FOTO DE FONDO */
+        /* Pantalla de Apertura / Bienvenida con FOTO DE FONDO DE TU REPOSITORIO */
         .welcome-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            /* Imagen de fondo con filtro oscuro para legibilidad */
             background: linear-gradient(rgba(0, 0, 0, 0.55), rgba(107, 29, 47, 0.7)), 
                         url('novios.jpg') no-repeat center center/cover;
             color: var(--color-blanco);
@@ -61,14 +60,14 @@
         }
 
         .welcome-card-box {
-            background: rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 30px 20px;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 35px 25px;
             border-radius: 20px;
             max-width: 380px;
             width: 90%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
         }
 
         .welcome-title {
@@ -330,7 +329,7 @@
 </head>
 <body>
 
-    <!-- Pantalla de Bienvenida con Foto de Fondo -->
+    <!-- Pantalla de Bienvenida con Foto de Fondo de tu Repositorio -->
     <div class="welcome-screen" id="welcome-screen">
         <div class="welcome-card-box">
             <h1 class="welcome-title">Jean Karlo &amp; Lucía</h1>
@@ -346,8 +345,10 @@
     <div class="music-control" onclick="toggleAudio()" title="Activar/Pausar Música">
         🎵
     </div>
-    <audio id="wedding-audio" loop>
-        <source src="https://upload.wikimedia.org/wikipedia/commons/2/22/Felix_Mendelssohn_-_Wedding_March.ogg" type="audio/ogg">
+    
+    <!-- Audio de la Marcha Nupcial directo y compatible -->
+    <audio id="wedding-audio" loop preload="auto">
+        <source src="https://ia800301.us.archive.org/24/items/FelixMendelssohnWeddingMarch/FelixMendelssohn-WeddingMarch.mp3" type="audio/mpeg">
     </audio>
 
     <div class="card-container">
@@ -357,7 +358,7 @@
             <h1 class="couple-names">Jean Karlo<br>&amp;<br>Lucía</h1>
             <p class="wedding-date-header">7 de Noviembre, 2026</p>
 
-            <!-- Foto de los novios -->
+            <!-- Foto de los novios apuntando al archivo subido en tu GitHub -->
             <div class="photo-frame">
                 <img src="novios.jpg" id="couple-photo" alt="Jean Karlo & Lucía">
             </div>
@@ -449,7 +450,7 @@
             audio.play().then(() => {
                 isPlaying = true;
             }).catch(error => {
-                console.log("Reproducción automática bloqueada por el navegador");
+                console.log("El navegador requiere interacción manual para el audio.");
             });
         }
 
