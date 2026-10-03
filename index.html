@@ -346,9 +346,10 @@
         🎵
     </div>
     
-    <!-- Servidor CDN directo con permisos CORS habilitados -->
-    <audio id="wedding-audio" loop crossorigin="anonymous" preload="auto">
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+    <!-- Elemento de audio apuntando a la ruta fija de marcha.mp3 -->
+    <audio id="wedding-audio" loop preload="auto">
+        <source src="./marcha.mp3" type="audio/mpeg">
+        <source src="marcha.mp3" type="audio/mpeg">
     </audio>
 
     <div class="card-container">
@@ -446,16 +447,24 @@
         const musicBtn = document.getElementById("music-btn");
         let isPlaying = false;
 
-        // Desbloqueo y reproducción garantizada con listener de evento directo
+        function startMusic() {
+            if (!audio) return;
+            audio.volume = 1.0;
+            audio.currentTime = 0;
+            
+            let playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isPlaying = true;
+                }).catch(err => {
+                    console.log("Reintento de reproducción manual:", err);
+                });
+            }
+        }
+
         btnOpen.addEventListener("click", function() {
             document.getElementById("welcome-screen").classList.add("hidden");
-            
-            audio.load();
-            audio.play().then(() => {
-                isPlaying = true;
-            }).catch(err => {
-                console.log("Reproducción bloqueada automáticamente por el navegador:", err);
-            });
+            startMusic();
         });
 
         musicBtn.addEventListener("click", function() {
@@ -463,8 +472,7 @@
                 audio.pause();
                 isPlaying = false;
             } else {
-                audio.play();
-                isPlaying = true;
+                startMusic();
             }
         });
 
