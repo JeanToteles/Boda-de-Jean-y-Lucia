@@ -337,19 +337,18 @@
             <p style="margin-bottom: 25px; font-style: italic; font-size: 0.95rem; opacity: 0.95; line-height: 1.5;">
                 Tenemos el honor de invitarte a celebrar el día más importante de nuestras vidas.
             </p>
-            <button class="btn-open" onclick="openInvitation()">💌 ABRIR INVITACIÓN</button>
+            <button class="btn-open" id="btn-open-invitation">💌 ABRIR INVITACIÓN</button>
         </div>
     </div>
 
     <!-- Botón flotante para la música -->
-    <div class="music-control" onclick="toggleAudio()" title="Activar/Pausar Música">
+    <div class="music-control" id="music-btn" title="Activar/Pausar Música">
         🎵
     </div>
     
-    <!-- Servidores de streaming MP3 directos e hipercompatibles con iOS y Android -->
-    <audio id="wedding-audio" loop preload="auto">
-        <source src="https://ia800301.us.archive.org/24/items/FelixMendelssohnWeddingMarch/FelixMendelssohn-WeddingMarch.mp3" type="audio/mpeg">
-        <source src="marcha.mp3" type="audio/mpeg">
+    <!-- Servidor CDN directo con permisos CORS habilitados -->
+    <audio id="wedding-audio" loop crossorigin="anonymous" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
     </audio>
 
     <div class="card-container">
@@ -443,26 +442,23 @@
     <!-- Scripts de la invitación -->
     <script>
         const audio = document.getElementById("wedding-audio");
+        const btnOpen = document.getElementById("btn-open-invitation");
+        const musicBtn = document.getElementById("music-btn");
         let isPlaying = false;
 
-        function openInvitation() {
+        // Desbloqueo y reproducción garantizada con listener de evento directo
+        btnOpen.addEventListener("click", function() {
             document.getElementById("welcome-screen").classList.add("hidden");
             
-            // Forzar reproducción al toque del usuario
-            if (audio) {
-                audio.volume = 0.8;
-                const playPromise = audio.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        isPlaying = true;
-                    }).catch(error => {
-                        console.log("Error al reproducir audio:", error);
-                    });
-                }
-            }
-        }
+            audio.load();
+            audio.play().then(() => {
+                isPlaying = true;
+            }).catch(err => {
+                console.log("Reproducción bloqueada automáticamente por el navegador:", err);
+            });
+        });
 
-        function toggleAudio() {
+        musicBtn.addEventListener("click", function() {
             if (isPlaying) {
                 audio.pause();
                 isPlaying = false;
@@ -470,7 +466,7 @@
                 audio.play();
                 isPlaying = true;
             }
-        }
+        });
 
         // Contador regresivo en tiempo real
         const weddingDate = new Date("Nov 7, 2026 10:00:00").getTime();
