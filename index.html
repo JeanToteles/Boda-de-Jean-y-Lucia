@@ -329,7 +329,7 @@
 </head>
 <body>
 
-    <!-- Pantalla de Bienvenida con Foto de Fondo -->
+    <!-- Pantalla de Bienvenida -->
     <div class="welcome-screen" id="welcome-screen">
         <div class="welcome-card-box">
             <h1 class="welcome-title">Jean Karlo &amp; Lucía</h1>
@@ -345,12 +345,6 @@
     <div class="music-control" id="music-btn" title="Activar/Pausar Música">
         🎵
     </div>
-    
-    <!-- Elemento de audio apuntando a la ruta fija de marcha.mp3 -->
-    <audio id="wedding-audio" loop preload="auto">
-        <source src="./marcha.mp3" type="audio/mpeg">
-        <source src="marcha.mp3" type="audio/mpeg">
-    </audio>
 
     <div class="card-container">
         
@@ -440,43 +434,65 @@
 
     </div>
 
-    <!-- Scripts de la invitación -->
+    <!-- Scripts de la invitación apuntando a musica.mp3 -->
     <script>
-        const audio = document.getElementById("wedding-audio");
-        const btnOpen = document.getElementById("btn-open-invitation");
-        const musicBtn = document.getElementById("music-btn");
+        let audioCtx;
+        let audioBuffer = null;
+        let sourceNode = null;
         let isPlaying = false;
 
-        function startMusic() {
-            if (!audio) return;
-            audio.volume = 1.0;
-            audio.currentTime = 0;
+        // Precargar el archivo musica.mp3
+        function preloadAudio() {
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+
+            fetch('musica.mp3')
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+                .then(decodedData => {
+                    audioBuffer = decodedData;
+                })
+                .catch(e => console.log("Error al precargar el audio:", e));
+        }
+
+        preloadAudio();
+
+        function playSound() {
+            if (!audioBuffer) return;
             
-            let playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    isPlaying = true;
-                }).catch(err => {
-                    console.log("Reintento de reproducción manual:", err);
-                });
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            sourceNode = audioCtx.createBufferSource();
+            sourceNode.buffer = audioBuffer;
+            sourceNode.loop = true;
+            sourceNode.connect(audioCtx.destination);
+            sourceNode.start(0);
+            isPlaying = true;
+        }
+
+        function stopSound() {
+            if (sourceNode) {
+                sourceNode.stop();
+                isPlaying = false;
             }
         }
 
-        btnOpen.addEventListener("click", function() {
+        document.getElementById("btn-open-invitation").addEventListener("click", function() {
             document.getElementById("welcome-screen").classList.add("hidden");
-            startMusic();
+            playSound();
         });
 
-        musicBtn.addEventListener("click", function() {
+        document.getElementById("music-btn").addEventListener("click", function() {
             if (isPlaying) {
-                audio.pause();
-                isPlaying = false;
+                stopSound();
             } else {
-                startMusic();
+                playSound();
             }
         });
 
-        // Contador regresivo en tiempo real
+        // Contador regresivo
         const weddingDate = new Date("Nov 7, 2026 10:00:00").getTime();
 
         const timer = setInterval(function() {
