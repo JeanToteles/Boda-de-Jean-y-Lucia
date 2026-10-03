@@ -346,8 +346,9 @@
         🎵
     </div>
     
-    <!-- Audio marcha.mp3 cargado en GitHub -->
+    <!-- Servidores de streaming MP3 directos e hipercompatibles con iOS y Android -->
     <audio id="wedding-audio" loop preload="auto">
+        <source src="https://ia800301.us.archive.org/24/items/FelixMendelssohnWeddingMarch/FelixMendelssohn-WeddingMarch.mp3" type="audio/mpeg">
         <source src="marcha.mp3" type="audio/mpeg">
     </audio>
 
@@ -441,17 +442,24 @@
 
     <!-- Scripts de la invitación -->
     <script>
-        // Abrir invitación y reproducir música
         const audio = document.getElementById("wedding-audio");
         let isPlaying = false;
 
         function openInvitation() {
             document.getElementById("welcome-screen").classList.add("hidden");
-            audio.play().then(() => {
-                isPlaying = true;
-            }).catch(error => {
-                console.log("El navegador requiere interacción manual para el audio.");
-            });
+            
+            // Forzar reproducción al toque del usuario
+            if (audio) {
+                audio.volume = 0.8;
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        isPlaying = true;
+                    }).catch(error => {
+                        console.log("Error al reproducir audio:", error);
+                    });
+                }
+            }
         }
 
         function toggleAudio() {
