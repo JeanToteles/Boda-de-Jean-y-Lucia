@@ -32,6 +32,61 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Contenedor de la lluvia de pétalos */
+        .petals-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .petal {
+            position: absolute;
+            top: -10%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.8;
+            animation: fall linear infinite, sway ease-in-out infinite;
+        }
+
+        /* SVG de pétalo elegante estilizado */
+        .petal-svg-1 {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><path fill="%238b1e3f" opacity="0.85" d="M15,30 C25,30 30,20 30,12 C30,4 20,0 15,0 C10,0 0,4 0,12 C0,20 5,30 15,30 Z"/></svg>');
+        }
+        .petal-svg-2 {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><path fill="%23c5a059" opacity="0.75" d="M15,30 C22,30 28,18 28,10 C28,2 18,0 15,0 C12,0 2,2 2,10 C2,18 8,30 15,30 Z"/></svg>');
+        }
+        .petal-svg-3 {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"><path fill="%23b83253" opacity="0.8" d="M15,30 C24,30 29,19 29,11 C29,3 19,0 15,0 C11,0 1,3 1,11 C1,19 6,30 15,30 Z"/></svg>');
+        }
+
+        @keyframes fall {
+            0% {
+                top: -10%;
+            }
+            100% {
+                top: 105%;
+            }
+        }
+
+        @keyframes sway {
+            0% {
+                transform: translateX(0) rotate(0deg);
+            }
+            50% {
+                transform: translateX(50px) rotate(180deg);
+            }
+            100% {
+                transform: translateX(0) rotate(360deg);
+            }
         }
 
         /* Pantalla de Apertura / Bienvenida */
@@ -117,6 +172,7 @@
             position: relative;
             margin: 10px;
             border: 1px solid rgba(197, 160, 89, 0.2);
+            z-index: 10;
         }
 
         /* Encabezado e imagen */
@@ -314,7 +370,7 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 100;
+            z-index: 1001;
             font-size: 1.2rem;
         }
 
@@ -328,6 +384,9 @@
     </style>
 </head>
 <body>
+
+    <!-- Lluvia constante de pétalos de rosa -->
+    <div class="petals-container" id="petals-container"></div>
 
     <!-- Pantalla de Bienvenida -->
     <div class="welcome-screen" id="welcome-screen">
@@ -434,14 +493,45 @@
 
     </div>
 
-    <!-- Scripts de la invitación apuntando a musica.mp3 -->
+    <!-- Scripts de la invitación -->
     <script>
+        // Generador dinámico de pétalos cayendo
+        function createPetals() {
+            const container = document.getElementById('petals-container');
+            const numberOfPetals = 18;
+            const svgClasses = ['petal-svg-1', 'petal-svg-2', 'petal-svg-3'];
+
+            for (let i = 0; i < numberOfPetals; i++) {
+                const petal = document.createElement('div');
+                const randomClass = svgClasses[Math.floor(Math.random() * svgClasses.length)];
+                
+                petal.classList.add('petal', randomClass);
+                
+                // Variaciones aleatorias para realismo
+                const size = Math.random() * 15 + 12; // entre 12px y 27px
+                const leftPosition = Math.random() * 100; // entre 0% y 100%
+                const fallDuration = Math.random() * 6 + 6; // entre 6s y 12s
+                const swayDuration = Math.random() * 3 + 3; // entre 3s y 6s
+                const delay = Math.random() * 8; // entre 0s y 8s
+
+                petal.style.width = `${size}px`;
+                petal.style.height = `${size}px`;
+                petal.style.left = `${leftPosition}%`;
+                petal.style.animationDuration = `${fallDuration}s, ${swayDuration}s`;
+                petal.style.animationDelay = `${delay}s, ${delay}s`;
+
+                container.appendChild(petal);
+            }
+        }
+
+        createPetals();
+
+        // Lógica de audio Web Audio API
         let audioCtx;
         let audioBuffer = null;
         let sourceNode = null;
         let isPlaying = false;
 
-        // Precargar el archivo musica.mp3
         function preloadAudio() {
             window.AudioContext = window.AudioContext || window.webkitAudioContext;
             audioCtx = new AudioContext();
@@ -452,7 +542,7 @@
                 .then(decodedData => {
                     audioBuffer = decodedData;
                 })
-                .catch(e => console.log("Error al precargar el audio:", e));
+                .catch(e => console.log("Error al precargar audio:", e));
         }
 
         preloadAudio();
